@@ -1,13 +1,23 @@
 import yfinance as yf
+import os
 
-def get_data(ticker):
-    print(f"Fetching data for {ticker}...")
+def download_stock_data(ticker, period="2y"):
+    print(f"🚀 Starting download for {ticker}...")
+    
+    # 1. Pull the data from Yahoo Finance
     stock = yf.Ticker(ticker)
-    # Get 1 year of daily data
-    hist = stock.history(period="1y")
-    print(hist.head()) # Shows the first 5 rows
-    return hist
+    df = stock.history(period=period)
+    
+    # 2. Make sure the 'data' folder exists
+    if not os.path.exists('data'):
+        os.makedirs('data')
+        
+    # 3. Save it to your data folder
+    file_path = f"data/{ticker}_history.csv"
+    df.to_csv(file_path)
+    
+    print(f"✅ Success! Saved {len(df)} days of data to {file_path}")
 
 if __name__ == "__main__":
-    data = get_data("AAPL")
-    print("Successfully fetched stock data!")
+    # You can change "AAPL" to "TSLA", "BTC-USD", etc.
+    download_stock_data("AAPL")

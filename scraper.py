@@ -1,17 +1,31 @@
 import requests
 from bs4 import BeautifulSoup
 
-def get_crypto_news():
-    url = "https://cryptopanic.com/news/" # Great for high-frequency sentiment
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
+def get_market_news():
+    print("📰 Fetching latest headlines from CNBC...")
     
-    # This looks for all news titles on the page
-    headlines = soup.find_all('a', class_='title-text')
+    # CNBC is generally easier to scrape for beginners
+    url = "https://www.cnbc.com/world-markets/"
+    headers = {'User-Agent': 'Mozilla/5.0'} 
     
-    print(f"--- Found {len(headlines)} recent headlines ---")
-    for i, title in enumerate(headlines[:5]): # Just show the top 5
-        print(f"{i+1}. {title.get_text(strip=True)}")
+    try:
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # CNBC uses the class 'Card-title' for their news links
+        headlines = soup.find_all('a', class_='Card-title')
+        
+        if not headlines:
+            print("⚠️ Still no luck. Let's try one more fallback...")
+            headlines = soup.find_all('div', class_='MarketCard-header')
+
+        print(f"\n--- Top {len(headlines[:10])} Market Headlines ---")
+        for i, article in enumerate(headlines[:10]):
+            title = article.get_text(strip=True)
+            print(f"{i+1}. {title}")
+            
+    except Exception as e:
+        print(f"❌ Error: {e}")
 
 if __name__ == "__main__":
-    get_crypto_news()
+    get_market_news()
