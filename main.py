@@ -1,23 +1,31 @@
-import yfinance as yf
 import os
+import yfinance as yf
+from scraper import run_smart_scraper
 
-def download_stock_data(ticker, period="2y"):
-    print(f"🚀 Starting download for {ticker}...")
-    
-    # 1. Pull the data from Yahoo Finance
-    stock = yf.Ticker(ticker)
-    df = stock.history(period=period)
-    
-    # 2. Make sure the 'data' folder exists
-    if not os.path.exists('data'):
-        os.makedirs('data')
-        
-    # 3. Save it to your data folder
-    file_path = f"data/{ticker}_history.csv"
-    df.to_csv(file_path)
-    
-    print(f"✅ Success! Saved {len(df)} days of data to {file_path}")
+def download_data(ticker):
+    print(f"\n📊 Downloading price data for {ticker}...")
+    df = yf.download(ticker, period="1mo", progress=False)
+    if not os.path.exists('data'): os.makedirs('data')
+    df.to_csv(f"data/{ticker}_history.csv")
+    print(f"✅ Data saved to data/{ticker}_history.csv")
+
+def get_verdict(ticker):
+    print(f"🤖 AI Analysis for {ticker}:")
+    # This calls your smart scraper (which now uses the AI)
+    # Note: In a future version, we can make the scraper search 
+    # specifically for the ticker name!
+    run_smart_scraper() 
 
 if __name__ == "__main__":
-    # You can change "AAPL" to "TSLA", "BTC-USD", etc.
-    download_stock_data("AAPL")
+    # Add as many as you want here!
+    watchlist = ["AAPL", "TSLA", "BTC-USD"]
+    
+    print(f"🌟 Starting AI Watchlist Analysis for: {watchlist}")
+    
+    for stock in watchlist:
+        print(f"\n" + "="*30)
+        download_data(stock)
+        get_verdict(stock)
+        print("="*30)
+        
+    print("\n🏁 All assets analyzed. Check your 'data' folder!")
