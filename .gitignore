@@ -1,0 +1,24 @@
+# --- AI & Large Models ---
+# This stops that 440MB FinBERT model from breaking GitHub
+models/
+.cache/
+hub/
+transformers/
+
+# --- Python Junk ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+
+# --- Data & Results ---
+# Keep your scripts on GitHub, but keep the heavy CSVs local
+data/*.csv
+*.log
+
+# --- Windows System Files ---
+Thumbs.db
+desktop.ini

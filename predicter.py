@@ -1,6 +1,6 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from torch import nn
-import torch
+import torch  
 
 # 1. Load the "Brain" (This might take a minute to download the first time)
 print("🧠 Loading the FinBERT AI model...")
