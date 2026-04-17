@@ -2,30 +2,44 @@ import requests
 from bs4 import BeautifulSoup
 
 def run_ticker_scraper(ticker):
-    print(f"🔍 Searching for specific news on: {ticker}...")
+    print(f"🔍 Hunting for {ticker} mentions in latest news...")
     
-    # We use CNBC's search URL format
-    search_url = f"https://www.cnbc.com/search/?query={ticker}&qsearchterm={ticker}"
+    # Using the 'Business' and 'Markets' sections which are rich in HTML headlines
+    urls = [
+        "https://www.cnbc.com/business/",
+        "https://www.cnbc.com/markets/"
+    ]
     
     headers = {'User-Agent': 'Mozilla/5.0'}
-    response = requests.get(search_url, headers=headers)
-    
-    if response.status_status != 200:
-        print("❌ Failed to reach CNBC search.")
-        return []
-
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    # CNBC search results usually use different CSS classes than the homepage
-    # This targets the 'SearchResult-searchResultTitle' class
     headlines = []
-    results = soup.find_all('span', class_='SearchResult-searchResultTitle')
-    
-    for res in results[:5]: # Get the top 5 most recent search results
-        headlines.append(res.get_text().strip())
-        
+
+    for url in urls:
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            if response.status_code != 200:
+                continue
+
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # CNBC uses 'Card-title' for headlines in these sections
+            cards = soup.find_all('a', class_='Card-title')
+            
+            for card in cards:
+                text = card.get_text().strip()
+                # Only grab the headline if it actually mentions our ticker or company name
+                # We'll check for the ticker (AAPL) or common names (Apple)
+                if ticker.lower() in text.lower():
+                    headlines.append(text)
+                
+                if len(headlines) >= 5: break # Don't overdo it
+        except Exception as e:
+            print(f"⚠️ Search error on {url}: {e}")
+
     if not headlines:
-        print(f"⚠️ No specific headlines found for {ticker}. Trying general news...")
-        # (Optional: Fallback to general news if search fails)
-        
+        print(f"💡 No direct {ticker} news found. Grabbing top market headlines instead.")
+        # Fallback: Just grab the top 3 general headlines so the AI has SOMETHING to do
+        fallback_cards = soup.find_all('a', class_='Card-title')
+        for card in fallback_cards[:3]:
+            headlines.append(card.get_text().strip())
+
     return headlines

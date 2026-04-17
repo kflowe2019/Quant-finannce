@@ -1,55 +1,68 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+import matplotlib.dates as mdates
 
 def create_market_chart(ticker):
     file_path = f"data/{ticker}_history.csv"
     
-    # 1. Load the data
+    if not os.path.exists(file_path):
+        print(f"❌ No data found for {ticker}")
+        return
+
+    # 1. LOAD AND CLEAN
     df = pd.read_csv(file_path)
-    print(f"Columns found in CSV: {df.columns.tolist()}") # This helps us debug!
-
-    # 2. Identify the Sentiment Column
-    # We check for common names we might have used
-    sent_col = None
-    for col in ['AI_Sentiment', 'Sentiment_Score', 'sentiment']:
-        if col in df.columns:
-            sent_col = col
-            break
     
-    if not sent_col:
-        print(f"❌ Error: Could not find a sentiment column in {file_path}")
-        print("Double check your data_manager.py to see what it named the column.")
-        return
+    # Drop yfinance's multi-level header if it exists
+    if df.iloc[0, 0] == "Price" or "Ticker" in str(df.columns):
+        df = df.iloc[1:].copy()
 
-    # 3. Clean up the dates and timezones
-    df['Date'] = pd.to_datetime(df['Date'], errors='coerce', utc=True) 
+    # 2. THE DATE FIX (No more 1970!)
+    if 'Date' not in df.columns:
+        df = df.reset_index().rename(columns={'index': 'Date'})
+
+    # Convert to datetime, strip timezones (Matplotlib hates mixed timezones)
+    df['Date'] = pd.to_datetime(df['Date'], utc=True).dt.tz_localize(None)
     
-    # 4. Drop rows that are missing the data we need to graph
-    df = df.dropna(subset=['Date', sent_col])
+    # 3. THE MATH FIX
+    df['Close'] = pd.to_numeric(df['Close'], errors='coerce')
+    df = df.dropna(subset=['Close', 'Date'])
+    
+    # Sort by date to ensure the line flows left-to-right
+    df = df.sort_values('Date')
 
-    if df.empty:
-        print(f"⚠️ No matching data found (rows with both Price and Sentiment).")
-        return
+    # 4. PLOTTING
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    # Plot the main price line
+    ax.plot(df['Date'], df['Close'], label='Market Price', color='#1f77b4', linewidth=2, alpha=0.8)
 
-    # 5. Setup the plot
-    fig, ax1 = plt.subplots(figsize=(12, 6))
+    # 5. ADD THE AI BUBBLE
+    last_row = df.iloc[-1]
+    if 'AI_Sentiment_Label' in df.columns and pd.notna(last_row['AI_Sentiment_Label']):
+        sentiment = last_row['AI_Sentiment_Label']
+        mood_color = 'green' if sentiment == 'Positive' else 'red' if sentiment == 'Negative' else 'gray'
+        
+        ax.scatter(last_row['Date'], last_row['Close'], color=mood_color, s=250, 
+                   label=f'AI Verdict: {sentiment}', edgecolors='black', zorder=5)
+        
+        ax.annotate(f"AI MOOD: {sentiment}", 
+                     (last_row['Date'], last_row['Close']), 
+                     textcoords="offset points", xytext=(0,15), ha='center', 
+                     fontweight='bold', color=mood_color,
+                     bbox=dict(boxstyle='round,pad=0.3', fc='white', ec=mood_color, alpha=0.8))
 
-    # Plot Price (Left)
-    color_price = 'tab:blue'
-    ax1.set_xlabel('Date')
-    ax1.set_ylabel('Stock Price ($)', color=color_price)
-    ax1.plot(df['Date'], df['Close'], color=color_price, label='Price')
+    # 6. MAKE THE X-AXIS READABLE
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+    plt.xticks(rotation=45)
 
-    # Plot Sentiment (Right)
-    ax2 = ax1.twinx() 
-    color_sent = 'tab:red'
-    ax2.set_ylabel('AI Sentiment', color=color_sent)
-    ax2.plot(df['Date'], df[sent_col], color=color_sent, linestyle='--', marker='o', label='AI Mood')
-    ax2.set_ylim(-1.1, 1.1) 
-
-    plt.title(f'Market Analysis: {ticker}')
-    plt.savefig(f"data/{ticker}_chart.png")
-    print(f"📈 Chart created successfully!")
+    plt.title(f"{ticker} Analysis: Price Action + AI Sentiment", fontsize=14, fontweight='bold')
+    plt.grid(True, linestyle='--', alpha=0.4)
+    plt.tight_layout() # Prevents labels from getting cut off
+    
+    plt.savefig(f"data/{ticker}_final_report.png")
+    print(f"✅ Time-travel fixed! Chart saved.")
     plt.show()
 
 if __name__ == "__main__":
