@@ -1,64 +1,66 @@
 import os
+import pandas as pd
 import yfinance as yf
+from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import pipeline
+import torch
 from scraper import run_ticker_scraper
-from predicter import analyze_sentiment
-from data_manager import update_csv_with_sentiment
+import csv
+from datetime import datetime
 
-def download_data(ticker):
-    print(f"\n📊 Downloading price data for {ticker}...")
-    # '1mo' gives the AI enough context, '1d' keeps the CSV clean
-    df = yf.download(ticker, period="1mo", interval="1d", progress=False)
+# --- NEW: LOGGING FUNCTION ---
+def log_sentiment(ticker, sentiment_score, label):
+    log_file = "data/sentiment_history.csv"
+    os.makedirs("data", exist_ok=True)
+    file_exists = os.path.isfile(log_file)
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    if not os.path.exists('data'): 
-        os.makedirs('data')
-        
-    file_path = f"data/{ticker}_history.csv"
-    df.to_csv(file_path)
-    print(f"✅ Data saved to {file_path}")
+    with open(log_file, mode='a', newline='') as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(['Timestamp', 'Ticker', 'Sentiment_Score', 'Label'])
+        writer.writerow([timestamp, ticker, sentiment_score, label])
+    print(f"📝 Logged {ticker} sentiment ({label}) to master history.")
 
-def get_ai_verdict(headlines):
+# --- AI SETUP ---
+print("🧠 Loading the FinBERT AI model...")
+finbert = BertForSequenceClassification.from_pretrained("prosusai/finbert")
+tokenizer = BertTokenizer.from_pretrained("prosusai/finbert")
+nlp = pipeline("sentiment-analysis", model=finbert, tokenizer=tokenizer)
+
+def analyze_sentiment(headlines):
     if not headlines:
         return "Neutral", 0.0
-    
-    print(f"🧠 AI is analyzing {len(headlines)} headlines...")
-    
-    scores = []
-    for h in headlines:
-        label, confidence = analyze_sentiment(h)
-        # Convert label to math: Positive = 1, Negative = -1, Neutral = 0
-        val = 1 if label == "Positive" else -1 if label == "Negative" else 0
-        scores.append(val * confidence)
-    
-    # Average the scores into one 'Mood' number
+    results = nlp(headlines)
+    scores = [res['score'] if res['label'] == 'positive' else -res['score'] if res['label'] == 'negative' else 0 for res in results]
     avg_score = sum(scores) / len(scores)
-    
-    # Determine the final label for the CSV
-    final_label = "Positive" if avg_score > 0.1 else "Negative" if avg_score < -0.1 else "Neutral"
-    
-    return final_label, abs(avg_score)
+    verdict = "Positive" if avg_score > 0.15 else "Negative" if avg_score < -0.15 else "Neutral"
+    return verdict, avg_score
+
+def process_watchlist(tickers):
+    for ticker in tickers:
+        print(f"\n" + "="*40)
+        # 1. Get Price Data
+        print(f"📊 Downloading price data for {ticker}...")
+        data = yf.download(ticker, period="1mo", interval="1d")
+        data.to_csv(f"data/{ticker}_history.csv")
+        
+        # 2. Get News & Analyze
+        headlines = run_ticker_scraper(ticker)
+        verdict, score = analyze_sentiment(headlines)
+        print(f"🤖 Verdict for {ticker}: {verdict} ({score:.2f})")
+        
+        # 3. Log to History
+        log_sentiment(ticker, score, verdict)
+        
+        # 4. Update the history file for the visualizer
+        df = pd.read_csv(f"data/{ticker}_history.csv")
+        df.loc[df.index[-1], 'AI_Sentiment_Label'] = verdict
+        df.loc[df.index[-1], 'AI_Sentiment'] = score
+        df.to_csv(f"data/{ticker}_history.csv", index=False)
+        print(f"✅ CSV Updated.")
 
 if __name__ == "__main__":
-    # Add any ticker you want here (e.g., "NVDA", "BTC-USD")
-    watchlist = ["AAPL", "TSLA", "BTC-USD"]
-    
-    print(f"🚀 Starting Watchlist Analysis for: {watchlist}")
-    
-    for stock in watchlist:
-        print(f"\n" + "="*40)
-        
-        # 1. Download Price
-        download_data(stock)
-        
-        # 2. Scrape specific news for this ticker
-        headlines = run_ticker_scraper(stock)
-        
-        # 3. Get AI sentiment score
-        label, score = get_ai_verdict(headlines)
-        print(f"🤖 Verdict for {stock}: {label} ({score:.2f})")
-        
-        # 4. Marry the data (Update the CSV)
-        update_csv_with_sentiment(stock, label, score)
-        
-        print("="*40)
-
+    watchlist = ['AAPL', 'TSLA', 'BTC-USD']
+    process_watchlist(watchlist)
     print("\n🏁 All assets updated. Ready for visualization!")
