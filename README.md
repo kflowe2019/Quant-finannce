@@ -1,12 +1,12 @@
 ## Project Members
 
-Kenny Flowde
-Thomas Ghirmatsion
-Ivan Gorodinsk
+- **Kenny Flowe**
+- **Thomas Ghirmatsion**
+- **Ivan Gorodinsk**
 
 # Quant-Finannce
 
-AI-powered quantitative trading system that uses FinBERT sentiment analysis to make trading decisions.
+AI-powered quantitative trading system that uses FinBERT sentiment analysis to gather trading data
 
 ## Overview
 
@@ -40,8 +40,6 @@ pip install -r requirements.txt
 - torch
 - scikit-learn
 - python-dotenv
-
-## Usage
 
 ### Run Full Analysis
 ```bash
@@ -82,4 +80,4 @@ python visualizer.py
 ## Requirements
 
 - Python 3.8+
-- Internet connection (for fetching data and downloading FinBERT model)
+- Internet connection
