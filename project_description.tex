@@ -1,0 +1,74 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{enumitem}
+
+\title{Quant-Finannce: AI-Powered Quantitative Trading System}
+\author{Kenny Flowe, Thomas Ghirmatsion, Ivan Gorodinsk}
+\date{April 20, 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\section*{Project Description}
+
+This project implements an AI-powered quantitative trading system that uses FinBERT sentiment analysis to gather trading data and make investment decisions. The system combines web scraping, natural language processing, and backtesting to create an automated trading strategy based on financial news sentiment.
+
+\section*{Key Features}
+
+\begin{itemize}[noitemsep]
+\item \textbf{Web Scraping}: Fetches latest stock news from Google News RSS feeds
+\item \textbf{AI Sentiment Analysis}: Uses FinBERT (Financial BERT) to classify news headlines as Positive, Negative, or Neutral
+\item \textbf{Backtesting}: Tests trading strategies based on AI-generated sentiment signals
+\item \textbf{Visualization}: Creates charts displaying price history and sentiment trends
+\end{itemize}
+
+\section*{Technical Architecture}
+
+The system consists of six Python modules:
+
+\begin{itemize}
+\item \textbf{main.py}: Main entry point that orchestrates data download, sentiment analysis, and backtesting
+\item \textbf{scraper.py}: Scrapes stock news from Google News RSS feeds for specified tickers
+\item \textbf{predicter.py}: Standalone sentiment analysis module using FinBERT
+\item \textbf{backtester.py}: Backtesting engine that simulates trading based on sentiment signals
+\item \textbf{visualizer.py}: Creates dual-pane charts showing price and sentiment history
+\item \textbf{data\_manager.py}: Utility for updating CSV files with sentiment data
+\end{itemize}
+
+\section*{Trading Strategy}
+
+The system implements a simple sentiment-based trading strategy:
+
+\begin{enumerate}
+\item \textbf{BUY}: When FinBERT sentiment is classified as Positive
+\item \textbf{SELL}: When FinBERT sentiment is classified as Negative
+\item \textbf{HOLD}: When sentiment is Neutral
+\end{enumerate}
+
+The backtester simulates trades using historical price data and logged sentiment scores to evaluate strategy performance.
+
+\section*{Data Outputs}
+
+\begin{itemize}
+\item \textbf{Price Data}: Stored in \texttt{data/\{ticker\}\_history.csv}
+\item \textbf{Sentiment History}: Master log in \texttt{data/sentiment\_history.csv}
+\end{itemize}
+
+\section*{Dependencies}
+
+\begin{itemize}
+\item pandas, yfinance, transformers, torch, scikit-learn, python-dotenv
+\end{itemize}
+
+\section*{Questions for Grader}
+
+\begin{enumerate}
+\item How can we improve the sentiment threshold values (currently set at $\pm$0.15) for better trade accuracy?
+\item Should we consider incorporating additional technical indicators alongside sentiment analysis?
+\item What improvements would you recommend for the backtesting methodology?
+\end{enumerate}
+
+\end{document}

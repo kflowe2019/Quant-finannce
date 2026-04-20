@@ -1,0 +1,217 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\title{Quant-Finannce: Technical Report}
+\author{Kenny Flowe, Thomas Ghirmatsion, Ivan Gorodinsk}
+\date{April 20, 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% ==============================================================================
+\section{Problem Definition and Motivation}
+% ==============================================================================
+
+\subsection{Problem Statement}
+
+This project addresses the challenge of making informed trading decisions in financial markets by leveraging artificial intelligence to analyze sentiment from financial news. The core problem is developing an automated system that can:
+
+\begin{itemize}
+\item Collect real-time financial news for specific stock tickers
+\item Accurately classify the sentiment of news headlines using state-of-the-art NLP
+\item Generate actionable trading signals based on sentiment analysis
+\item Evaluate trading strategies through backtesting
+\end{itemize}
+
+\subsection{Relevance and Context}
+
+Quantitative trading has evolved significantly over the past decade, with machine learning and natural language processing playing increasingly important roles in investment decision-making. Traditional quantitative strategies rely heavily on numerical indicators such as price movements, volume, and technical indicators. However, the emergence of large language models and sentiment analysis tools has opened new avenues for incorporating qualitative information—specifically, news and market sentiment—into trading strategies.
+
+The relevance of this project extends beyond academic exercise:
+
+\begin{itemize}
+\item \textbf{Real-world applicability}: Sentiment-driven trading is used by hedge funds and institutional investors
+\item \textbf{Emerging technology}: Demonstrates practical application of FinBERT, a specialized financial language model
+\item \textbf{Accessible implementation}: Shows how sophisticated AI can be applied with modest resources
+\item \textbf{Educational value}: Provides hands-on experience with ML pipelines, data collection, and backtesting
+\end{itemize}
+
+Our motivation stems from exploring how AI can augment human decision-making in finance, while also understanding the limitations and risks inherent in such systems.
+
+% ==============================================================================
+\section{Methodology and Technical Approach}
+% ==============================================================================
+
+\subsection{System Architecture}
+
+The Quant-Finannce system follows a modular pipeline architecture:
+
+\begin{enumerate}
+\item \textbf{Data Collection Layer}: Web scraping (Google News RSS) + API data (yfinance)
+\item \textbf{Processing Layer}: Sentiment analysis using FinBERT
+\item \textbf{Decision Layer}: Trading signal generation based on sentiment thresholds
+\item \textbf{Evaluation Layer}: Backtesting engine for strategy validation
+\item \textbf{Visualization Layer}: Chart generation for results analysis
+\end{enumerate}
+
+\subsection{Machine Learning Approach}
+
+We utilize \textbf{FinBERT}, a pre-trained BERT model specifically fine-tuned for financial text. FinBERT was developed by Prosus AI and trained on financial news and filings, making it particularly suited for our use case.
+
+\begin{itemize}
+\item \textbf{Model}: prosusai/finbert
+\item \textbf{Input}: News headlines (text)
+\item \textbf{Output}: Sentiment classification (Positive/Negative/Neutral) with confidence scores
+\end{itemize}
+
+\subsection{Sentiment Analysis Pipeline}
+
+\begin{enumerate}
+\item \textbf{Text Input}: Raw headlines from Google News RSS feed
+\item \textbf{Tokenization}: BERT tokenizer with padding and truncation
+\item \textbf{Inference}: Forward pass through FinBERT model
+\item \textbf{Softmax}: Apply softmax to logits for probability distribution
+\item \textbf{Classification}: Select class with highest probability
+\item \textbf{Scoring}: Convert to numerical score (positive = +score, negative = -score, neutral = 0)
+\end{enumerate}
+
+The sentiment score is computed as:
+\begin{equation}
+\text{Score} = \frac{1}{n} \sum_{i=1}^{n} s_i
+\end{equation}
+where $s_i = +confidence$ if Positive, $-confidence$ if Negative, $0$ if Neutral.
+
+Trading signals are generated using threshold values:
+\begin{equation}
+\text{Signal} = 
+\begin{cases}
+\text{BUY} & \text{if Score} > 0.15 \\
+\text{SELL} & \text{if Score} < -0.15 \\
+\text{HOLD} & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\subsection{Backtesting Methodology}
+
+The backtester simulates trading with the following assumptions:
+\begin{itemize}
+\item Initial capital: \$1,000 (configurable)
+\item Position sizing: Invest all available capital when BUY signal
+\item Exit strategy: Sell all shares when SELL signal
+\item Transaction costs: Not modeled (simplification)
+\end{itemize}
+
+Performance metrics calculated:
+\begin{equation}
+\text{Profit} = \text{Final Value} - \text{Initial Capital}
+\end{equation}
+\begin{equation}
+\text{Return \%} = \frac{\text{Profit}}{\text{Initial Capital}} \times 100
+\end{equation}
+
+% ==============================================================================
+\section{Experiments and Evaluation}
+% ==============================================================================
+
+\subsection{Experimental Design}
+
+We designed experiments to evaluate:
+\begin{enumerate}
+\item \textbf{Sentiment Accuracy}: How well FinBERT classifies financial headlines
+\item \textbf{Strategy Performance}: Does sentiment-based trading generate positive returns?
+\item \textbf{Threshold Sensitivity}: How do different threshold values affect results?
+\end{enumerate}
+
+\subsection{Evaluation Metrics}
+
+\begin{itemize}
+\item \textbf{Classification Confidence}: Model's confidence score for each prediction
+\item \textbf{Profit/Loss}: Net gain or loss from backtest
+\item \textbf{Trade Count}: Number of buy/sell executed
+\item \textbf{Holding Period}: Average time between buy and sell
+\end{itemize}
+
+\subsection{Baseline Comparisons}
+
+We compare our strategy against:
+\begin{enumerate}
+\item \textbf{Buy and Hold}: Purchase at start, hold until end
+\item \textbf{Random Strategy}: Random buy/sell signals
+\item \textbf{Threshold Variations}: Testing different sentiment thresholds
+\end{enumerate}
+
+\subsection{Results Interpretation}
+
+Expected outcomes based on literature:
+\begin{itemize}
+\item FinBERT should demonstrate high accuracy on financial text (published accuracy $\approx$ 90\%)
+\item Sentiment-based strategies may show mixed results due to market efficiency
+\item Threshold tuning is critical—too sensitive generates excessive trades, too conservative misses opportunities
+\end{itemize}
+
+\subsection{Limitations and Errors}
+
+\begin{enumerate}
+\item \textbf{Data Scope}: Limited to 1 month of historical data and 10 headlines per run
+\item \textbf{Look-ahead Bias}: Sentiment is logged after news appears, but backtest uses same-day prices
+\item \textbf{Market Efficiency}: In efficient markets, sentiment may already be priced in
+\item \textbf{No Transaction Costs}: Real trading would incur fees that reduce returns
+\item \textbf{Single Model Dependency}: Relies entirely on FinBERT without ensemble methods
+\item \textbf{News Source Bias}: Google News may not represent all market-relevant information
+\end{enumerate}
+
+% ==============================================================================
+\section{Ethical Considerations and AI Usage Disclosure}
+% ==============================================================================
+
+\subsection{AI Tools Used}
+
+\begin{itemize}
+\item \textbf{FinBERT (prosusai/finbert)}: Pre-trained transformer model for sentiment analysis
+\item \textbf{BERT Tokenizer}: For text preprocessing
+\item \textbf{PyTorch}: Deep learning framework
+\item \textbf{yfinance}: Yahoo Finance API for market data
+\end{itemize}
+
+All AI tools used are publicly available, pre-trained models. No custom training was performed in this project.
+
+\subsection{Potential Biases}
+
+\begin{enumerate}
+\item \textbf{Model Bias}: FinBERT was trained on English-language financial news, which may not represent global markets
+\item \textbf{Selection Bias}: Google News RSS may favor certain outlets or story types
+\item \textbf{Temporal Bias}: Results may be specific to the time period analyzed and not generalize
+\item \textbf{Confirmation Bias}: The strategy assumes sentiment predicts price movements, which may not hold universally
+\end{enumerate}
+
+\subsection{Ethical Considerations}
+
+\begin{enumerate}
+\item \textbf{Financial Risk}: Using AI for trading decisions carries financial risk; this project is for educational purposes only
+\item \textbf{Transparency}: The system's limitations should be clearly communicated to any potential users
+\item \textbf{Responsible Use}: This tool should not be used for actual investment decisions without proper oversight
+\item \textbf{Data Privacy}: The system processes publicly available news data; no personal information is collected
+\end{enumerate}
+
+\subsection{Disclaimer}
+
+This project is developed for academic and educational purposes. The trading strategies implemented are simplified models that do not account for many real-world factors including transaction costs, slippage, market impact, or regulatory requirements. Past performance does not guarantee future results. The authors do not recommend using this system for actual investment decisions.
+
+% ==============================================================================
+\section{Conclusion}
+
+This project demonstrates the practical application of modern NLP techniques (FinBERT) in financial decision-making. While the system provides a functional pipeline for sentiment-based trading, the evaluation section highlights important limitations and areas for improvement. Future work could explore:
+\begin{itemize}
+\item Ensemble methods combining multiple sentiment models
+\item Integration of technical indicators alongside sentiment
+\item Extended backtesting periods
+\item Real-time paper trading for live validation
+\end{itemize}
+
+\end{document}
