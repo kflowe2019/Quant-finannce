@@ -2,8 +2,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from torch import nn
 import torch  
 
-# 1. Load the "Brain" (This might take a minute to download the first time)
-print("🧠 Loading the FinBERT AI model...")
+# Loads the FinBERT AI model, which 
+print("Loading the FinBERT AI model...")
 model_name = "prosusai/finbert"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
