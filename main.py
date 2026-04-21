@@ -17,19 +17,20 @@ def log_sentiment(ticker, sentiment_score, label):
     
     with open(log_file, mode='a', newline='') as f: # open log file in append mode
         writer = csv.writer(f)
-        if not file_exists:
+        if not file_exists: # writes the first row of the file if the file's new
             writer.writerow(['Timestamp', 'Ticker', 'Sentiment_Score', 'Label'])
-        writer.writerow([timestamp, ticker, sentiment_score, label])
+        writer.writerow([timestamp, ticker, sentiment_score, label]) # write the new row with all of the details (current timestamp, the stock name ticker, the score, and the label)
     print(f"📝 Logged {ticker} sentiment ({label}) to master history.")
 
-# --- AI SETUP ---
+# Loads or downloads the FinBERT AI model, and loads the tokenizer
 print("🧠 Loading the FinBERT AI model...")
 finbert = BertForSequenceClassification.from_pretrained("prosusai/finbert")
 tokenizer = BertTokenizer.from_pretrained("prosusai/finbert")
-nlp = pipeline("sentiment-analysis", model=finbert, tokenizer=tokenizer)
+nlp = pipeline("sentiment-analysis", model=finbert, tokenizer=tokenizer) # combines the model and the tokenizer
 
+# 
 def analyze_sentiment(headlines):
-    if not headlines:
+    if not headlines: # if the headlines are empty, return a neutral score of 0
         return "Neutral", 0.0
     results = nlp(headlines)
     scores = [res['score'] if res['label'] == 'positive' else -res['score'] if res['label'] == 'negative' else 0 for res in results]
