@@ -8,14 +8,14 @@ from scraper import run_ticker_scraper
 import csv
 from datetime import datetime
 
-# --- NEW: LOGGING FUNCTION ---
+# Logs the AI's final decisions into a log file
 def log_sentiment(ticker, sentiment_score, label):
-    log_file = "data/sentiment_history.csv"
-    os.makedirs("data", exist_ok=True)
+    log_file = "data/sentiment_history.csv" 
+    os.makedirs("data", exist_ok=True) # create file form log_file if doesn't exist
     file_exists = os.path.isfile(log_file)
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S") # grabs current timestamp
     
-    with open(log_file, mode='a', newline='') as f:
+    with open(log_file, mode='a', newline='') as f: # open log file in append mode
         writer = csv.writer(f)
         if not file_exists:
             writer.writerow(['Timestamp', 'Ticker', 'Sentiment_Score', 'Label'])
