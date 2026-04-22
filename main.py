@@ -28,7 +28,6 @@ finbert = BertForSequenceClassification.from_pretrained("prosusai/finbert")
 tokenizer = BertTokenizer.from_pretrained("prosusai/finbert")
 nlp = pipeline("sentiment-analysis", model=finbert, tokenizer=tokenizer) # combines the model and the tokenizer
 
-# 
 def analyze_sentiment(headlines):
     if not headlines: # if the news headlines are empty, return a neutral score of 0
         return "Neutral", 0.0
@@ -39,22 +38,22 @@ def analyze_sentiment(headlines):
     return verdict, avg_score
 
 def process_watchlist(tickers):
-    for ticker in tickers:
+    for ticker in tickers: # goes through the tickers listed in the array
         print(f"\n" + "="*40)
-        # 1. Get Price Data
+        # Get the daily stock prices within the last month, and saves it to a csv file
         print(f"📊 Downloading price data for {ticker}...")
         data = yf.download(ticker, period="1mo", interval="1d")
         data.to_csv(f"data/{ticker}_history.csv")
         
-        # 2. Get News & Analyze
+        # Calls the analyze_sentiment function with the news headline to grab the AI's verdict and score
         headlines = run_ticker_scraper(ticker)
         verdict, score = analyze_sentiment(headlines)
         print(f"🤖 Verdict for {ticker}: {verdict} ({score:.2f})")
         
-        # 3. Log to History
+        # Log the AI's output data to the history
         log_sentiment(ticker, score, verdict)
         
-        # 4. Update the history file for the visualizer
+        # Updates the history file for the visualizer
         df = pd.read_csv(f"data/{ticker}_history.csv")
         df.loc[df.index[-1], 'AI_Sentiment_Label'] = verdict
         df.loc[df.index[-1], 'AI_Sentiment'] = score
