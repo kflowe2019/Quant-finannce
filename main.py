@@ -30,12 +30,12 @@ nlp = pipeline("sentiment-analysis", model=finbert, tokenizer=tokenizer) # combi
 
 # 
 def analyze_sentiment(headlines):
-    if not headlines: # if the headlines are empty, return a neutral score of 0
+    if not headlines: # if the news headlines are empty, return a neutral score of 0
         return "Neutral", 0.0
-    results = nlp(headlines)
-    scores = [res['score'] if res['label'] == 'positive' else -res['score'] if res['label'] == 'negative' else 0 for res in results]
-    avg_score = sum(scores) / len(scores)
-    verdict = "Positive" if avg_score > 0.15 else "Negative" if avg_score < -0.15 else "Neutral"
+    results = nlp(headlines) # store the AI's evaluations 
+    scores = [res['score'] if res['label'] == 'positive' else -res['score'] if res['label'] == 'negative' else 0 for res in results] # change the sign of the score based on what the AI labeled it as
+    avg_score = sum(scores) / len(scores) 
+    verdict = "Positive" if avg_score > 0.15 else "Negative" if avg_score < -0.15 else "Neutral" # decides a final verdict based on the average score
     return verdict, avg_score
 
 def process_watchlist(tickers):
