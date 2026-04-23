@@ -14,7 +14,7 @@
 
 \section*{Project Description}
 
-This project implements an AI-powered quantitative trading system that uses FinBERT sentiment analysis to gather trading data and make investment decisions. The system combines web scraping, natural language processing, and backtesting to create an automated trading strategy based on financial news sentiment.
+Our project implements an AI-powered quantitative trading system that uses FinBERT sentiment analysis to gather trading data and make investment decisions. Our system combines web scraping, natural language processing, and backtesting to create an automated trading strategy based on financial news sentiment.
 
 \section*{Key Features}
 
@@ -27,7 +27,7 @@ This project implements an AI-powered quantitative trading system that uses FinB
 
 \section*{Technical Architecture}
 
-The system consists of six Python modules:
+Our system consists of six Python modules:
 
 \begin{itemize}
 \item \textbf{main.py}: Main entry point that orchestrates the data download and the sentiment analysis. It orchestrates downloading the historical market data, scraping the news headlines, and passing the data to a model to calculate a verdict.
@@ -40,7 +40,7 @@ The system consists of six Python modules:
 
 \section*{Trading Strategy}
 
-The system implements a simple sentiment-based trading strategy:
+Our system implements a simple sentiment-based trading strategy:
 
 \begin{enumerate}
 \item \textbf{BUY}: When FinBERT sentiment is classified as Positive
@@ -48,7 +48,7 @@ The system implements a simple sentiment-based trading strategy:
 \item \textbf{HOLD}: When sentiment is Neutral
 \end{enumerate}
 
-The backtester simulates trades using historical price data and logged sentiment scores to evaluate strategy performance.
+Our backtester simulates trades using historical price data and logged sentiment scores to evaluate strategy performance.
 
 \section*{Data Outputs}
 
@@ -60,15 +60,20 @@ The backtester simulates trades using historical price data and logged sentiment
 \section*{Dependencies}
 
 \begin{itemize}
-\item pandas, yfinance, transformers, torch, scikit-learn, python-dotenv
+\item pandas
+\item yfinance
+\item transformers
+\item torch
+\item scikit-learn
+\item python-dotenv
 \end{itemize}
 
-\section*{Questions for Grader}
+\section*{Questions for the Grader}
 
 \begin{enumerate}
 \item How can we improve our sentiment threshold values (currently set at $\pm$0.15) for better trade accuracy?
 \item Should we consider implementing additional technical indicators alongside sentiment analysis?
-\item What improvements would you recommend for our backtesting methodology?
+\item What suggestions do you have or improvements you would recommend for our backtesting methodology?
 \end{enumerate}
 
 \end{document}
