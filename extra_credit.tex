@@ -30,12 +30,12 @@ This project implements an AI-powered quantitative trading system that uses FinB
 The system consists of six Python modules:
 
 \begin{itemize}
-\item \textbf{main.py}: Main entry point that orchestrates data download, sentiment analysis, and backtesting
-\item \textbf{scraper.py}: Scrapes stock news from Google News RSS feeds for specified tickers
-\item \textbf{predicter.py}: Standalone sentiment analysis module using FinBERT
-\item \textbf{backtester.py}: Backtesting engine that simulates trading based on sentiment signals
-\item \textbf{visualizer.py}: Creates dual-pane charts showing price and sentiment history
-\item \textbf{data\_manager.py}: Utility for updating CSV files with sentiment data
+\item \textbf{main.py}: Main entry point that orchestrates the data download and the sentiment analysis. It orchestrates downloading the historical market data, scraping the news headlines, and passing the data to a model to calculate a verdict.
+\item \textbf{scraper.py}: Scrapes stock news from Google News RSS feeds for the specified tickers (e.g. AAPL).
+\item \textbf{predicter.py}: Standalone sentiment analysis module using FinBERT.
+\item \textbf{backtester.py}: The backtesting engine that simulates trading based on sentiment signals.
+\item \textbf{visualizer.py}: Creates dual-pane charts showing the price and sentiment history.
+\item \textbf{data\_manager.py}: Used for updating CSV files with the sentiment data.
 \end{itemize}
 
 \section*{Trading Strategy}
@@ -66,9 +66,9 @@ The backtester simulates trades using historical price data and logged sentiment
 \section*{Questions for Grader}
 
 \begin{enumerate}
-\item How can we improve the sentiment threshold values (currently set at $\pm$0.15) for better trade accuracy?
-\item Should we consider incorporating additional technical indicators alongside sentiment analysis?
-\item What improvements would you recommend for the backtesting methodology?
+\item How can we improve our sentiment threshold values (currently set at $\pm$0.15) for better trade accuracy?
+\item Should we consider implementing additional technical indicators alongside sentiment analysis?
+\item What improvements would you recommend for our backtesting methodology?
 \end{enumerate}
 
 \end{document}
