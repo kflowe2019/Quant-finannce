@@ -5,7 +5,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 
-\title{Quant-Finannce: Final Technical Report}
+\title{Quant-Finannce: Final Report}
 \author{Kenneth Flowe, Thomas Ghirmatsion, Ivan Gorodinski}
 \date{April 20, 2026}
 
@@ -15,40 +15,9 @@
 \thispagestyle{empty}
 
 % ==============================================================================
-\section{Presentation}
 % ==============================================================================
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.9\textwidth]{pics/pic1.png}
-\caption{Output from running terminal commands}
-\end{figure}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.9\textwidth]{pics/pic2.png}
-\caption{Output from running terminal commands}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.9\textwidth]{pics/pic3.png}
-\caption{Output from running terminal commands}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-includegraphics[width=0.9\textwidth]{pics/pic4.png}
-\caption{Output from running terminal commands}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.9\textwidth]{pics/pic5.png}
-\caption{Output from running terminal commands}
-\end{figure}
-
-\clearpage
 
 % ==============================================================================
 \section{Problem Definition and Motivation}
@@ -69,6 +38,8 @@ This project addresses the challenge of making informed trading decisions in fin
 
 Quantitative trading has evolved significantly over the past decade, with machine learning and natural language processing playing increasingly important roles in investment decision-making. Traditional quantitative strategies rely heavily on numerical indicators such as price movements, volume, and technical indicators. However, the emergence of large language models and sentiment analysis tools has opened new avenues for incorporating qualitative information—specifically, news and market sentiment—into trading strategies.
 
+\vspace{\baselineskip}
+
 The relevance of this project extends beyond academic exercise:
 
 \begin{itemize}
@@ -86,7 +57,7 @@ Our motivation stems from exploring how AI can augment human decision-making in 
 
 \subsection{System Architecture}
 
-The Quant-Finannce system follows a modular pipeline architecture:
+Our Quant-Finannce system follows a modular pipeline architecture:
 
 \begin{enumerate}
 \item \textbf{Data Collection Layer}: Web scraping (Google News RSS) + API data (yfinance)
@@ -123,7 +94,9 @@ The sentiment score is computed as:
 \end{equation}
 where $s_i = +confidence$ if Positive, $-confidence$ if Negative, $0$ if Neutral.
 
-Trading signals are generated using threshold values:
+\vspace{\baselineskip}
+
+The trading signals are generated using these threshold values:
 \begin{equation}
 \text{Signal} = 
 \begin{cases}
@@ -135,7 +108,7 @@ Trading signals are generated using threshold values:
 
 \subsection{Backtesting Methodology}
 
-The backtester simulates trading with the following assumptions:
+Our backtester simulates trading with the following assumptions:
 \begin{itemize}
 \item Initial capital: \$1,000 (configurable)
 \item Position sizing: Invest all available capital when BUY signal
@@ -159,7 +132,7 @@ Performance metrics calculated:
 
 We designed experiments to evaluate:
 \begin{enumerate}
-\item \textbf{Sentiment Accuracy}: How well FinBERT classifies financial headlines
+\item \textbf{Sentiment Accuracy}: How well does FinBERT classifies financial headlines?
 \item \textbf{Strategy Performance}: Does sentiment-based trading generate positive returns?
 \item \textbf{Threshold Sensitivity}: How do different threshold values affect results?
 \end{enumerate}
@@ -173,6 +146,7 @@ We designed experiments to evaluate:
 \item \textbf{Holding Period}: Average time between buy and sell
 \end{itemize}
 
+
 \subsection{Baseline Comparisons}
 
 We compare our strategy against:
@@ -181,6 +155,74 @@ We compare our strategy against:
 \item \textbf{Random Strategy}: Random buy/sell signals
 \item \textbf{Threshold Variations}: Testing different sentiment thresholds
 \end{enumerate}
+
+\section{3.4 Results}
+Our evaluation of the Quant-Finannce system, conducted over the period of April 17th to April 20th, 2026, yielded the following performance metrics:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Metric} & \textbf{Sentiment Strategy} & \textbf{Buy and Hold} & \textbf{Random Strategy} \\ \hline
+Final Portfolio Value & \$1,000.00 & \$1,007.45 & \$998.20 \\ \hline
+Total Profit/Loss & \$0.00 & +\$7.45 & -\$1.80 \\ \hline
+Trade Count & 0 & 1 & 4 \\ \hline
+\end{tabular}
+\caption{Backtesting performance comparison across strategies.}
+\end{table}
+
+\textbf{Observations:}
+\begin{itemize}
+    \item \textbf{Sentiment Accuracy:} During our initial testing, the model frequently defaulted to "Neutral" (Score 0.00) due to technical constraints in parsing specific ticker news via the Google News RSS feed.
+    \item \textbf{Strategy Performance:} Because the model often returned a "Neutral" verdict, the sentiment strategy did not trigger a buy or sell signal, resulting in a static portfolio value of \$1,000.00.
+    \item \textbf{Threshold Sensitivity:} The current sensitivity threshold of $\pm0.15$ proved too conservative for the available news feed, failing to generate actionable signals during the observed period.
+\end{itemize}
+
+\section{3.5 Discussion and Future Improvements}
+In response to our initial research objectives, we have identified the following improvements to address system limitations:
+
+\begin{enumerate}
+    \item \textbf{Sentiment Threshold Optimization:} Our current threshold of $\pm0.15$ is a static baseline. To improve trade accuracy, we propose implementing dynamic thresholds based on volatility-adjusted sentiment scores or by using a validation set to empirically determine the optimal threshold for specific tickers.
+    
+    \item \textbf{Integration of Technical Indicators:} We recognize that sentiment alone may not capture market mechanics. Future iterations will integrate technical indicators such as Moving Average Convergence Divergence (MACD) and Relative Strength Index (RSI) to act as secondary filters, ensuring that trades are executed only when sentiment signals align with favorable technical setups.
+    
+    \item \textbf{Back-testing Methodology:} To improve our back-testing rigor, we will move beyond our current simplified model. Future improvements will incorporate realistic transaction costs (commissions and slippage), model market impact, and utilize an extended historical dataset to test strategy robustness across diverse market regimes.
+\end{enumerate}
+
+
+\subsection{Results}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{pics/pic1.png}
+\caption{Output from running terminal commands}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{pics/pic2.png}
+\caption{Output from running terminal commands}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{pics/pic3.png}
+\caption{Output from running terminal commands}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{pics/pic4.png}
+\caption{Output from running terminal commands}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{pics/pic5.png}
+\caption{Output from running terminal commands}
+\end{figure}
+
+\clearpage
 
 \subsection{Results Interpretation}
 
@@ -200,6 +242,17 @@ Expected outcomes based on literature:
 \item \textbf{No Transaction Costs}: Real trading would incur fees that reduce returns
 \item \textbf{Single Model Dependency}: Relies entirely on FinBERT without ensemble methods
 \item \textbf{News Source Bias}: Google News may not represent all market-relevant information
+\end{enumerate}
+
+\section{3.7 Discussion and Future Improvements}
+In response to the exploratory questions regarding our system's development, we have identified the following improvements and design considerations:
+
+\begin{enumerate}
+    \item \textbf{Sentiment Threshold Optimization:} Our current threshold of $\pm0.15$ is a static baseline. To improve trade accuracy, we propose implementing dynamic thresholds based on volatility-adjusted sentiment scores or by using a validation set to empirically determine the optimal threshold that maximizes the Sharpe ratio for specific tickers.
+    
+    \item \textbf{Integration of Technical Indicators:} We recognize that sentiment alone may not capture market mechanics. Future iterations of this system will integrate technical indicators such as Moving Average Convergence Divergence (MACD) and Relative Strength Index (RSI) to act as secondary filters, ensuring that trades are executed only when sentiment signals align with favorable technical setups.
+    
+    \item \textbf{Back-testing Methodology:} To improve our back-testing rigor, we will move beyond our current simplified model. Future improvements will incorporate realistic transaction costs (commissions and slippage), model market impact, and utilize an extended historical dataset to test strategy robustness across diverse market regimes.
 \end{enumerate}
 
 % ==============================================================================
