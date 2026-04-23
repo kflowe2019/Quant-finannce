@@ -1,8 +1,8 @@
 ## Project Members
 
-- **Kenny Flowe**
+- **Kenneth Flowe**
 - **Thomas Ghirmatsion**
-- **Ivan Gorodinsk**
+- **Ivan Gorodinski**
 
 # Quant-Finannce
 
